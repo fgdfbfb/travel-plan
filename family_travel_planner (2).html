@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Family Adventure — Travel Planner</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#19334a;--muted:#63788a;--blue:#dff2ff;--mint:#dff7ed;--coral:#ff806b;--cream:#fffaf2;--line:#e5eaf0;--purple:#eee8ff}
+*{box-sizing:border-box}body{margin:0;background:#f5f8fc;color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(120deg,#dff2ff,#f0eaff 55%,#fff1e4);padding:30px max(20px,calc((100vw - 1200px)/2));border-bottom:1px solid #e5eaf0}
+.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:11px;font-weight:800;color:#4e7893}h1{font-size:clamp(28px,4vw,44px);line-height:1.08;margin:8px 0}header p{max-width:720px;color:#52697a;margin:10px 0 0}
+.wrap{max-width:1200px;margin:22px auto;padding:0 18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 6px 22px #19334a08}.stat small{display:block;color:var(--muted)}.stat strong{font-size:22px}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:16px}.panel h2{font-size:18px;margin:0 0 12px}.map-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}#map{height:450px;border-radius:13px;background:#eaf1f5;overflow:hidden}
+button,input,select,textarea{font:inherit}button{border:0;border-radius:11px;padding:10px 14px;background:#193f5a;color:white;cursor:pointer;font-weight:700}button.secondary{background:#edf4f8;color:#23445c}button.coral{background:var(--coral);color:#fff}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #86cfff;outline-offset:2px}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.route-list{display:grid;gap:10px}.stop{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fff}.stop.active{border-color:#ff9b88;background:#fff8f5}.emoji{width:38px;height:38px;border-radius:12px;background:var(--blue);display:grid;place-items:center;font-size:21px}.stop h3{font-size:15px;margin:0}.stop p{margin:3px 0 0;color:var(--muted);font-size:12px}.tag{display:inline-block;font-size:11px;border-radius:20px;padding:4px 8px;background:var(--mint);color:#22624c;font-weight:800}.stop button{padding:7px 9px;font-size:12px}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;font-weight:800;color:var(--muted)}input,select,textarea{width:100%;border:1px solid #d8e1e9;border-radius:10px;padding:10px;background:#fff;color:var(--ink)}textarea{min-height:72px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.budget-row{display:grid;grid-template-columns:1fr 130px auto;gap:8px;margin:8px 0}.budget-row input{min-width:0}.check{display:flex;align-items:center;gap:9px;padding:8px 0}.check input{width:auto}.note{background:#fff5df;border:1px solid #f4dfae;border-radius:13px;padding:12px;color:#6c5422;font-size:13px}.muted{color:var(--muted);font-size:12px}.section{margin-top:16px}.footer{color:var(--muted);font-size:12px;text-align:center;padding:25px}
+.leaflet-div-icon{background:transparent;border:0}.moving{font-size:27px;filter:drop-shadow(0 2px 2px #0003);line-height:1}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}#map{height:360px}}@media(max-width:460px){.two{grid-template-columns:1fr}.budget-row{grid-template-columns:1fr 95px auto}.stat strong{font-size:18px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">The family trip planner · Summer 2027 · 4 travellers</div><h1>Our Family Adventure ✈️</h1><p>Vancouver → Paris → Trier → Zurich → Kandersteg → Milan → Ancona → Split → Suceava → Ostroh. A shared-feeling home base for the map, itinerary, budget and to-dos.</p></header>
+<main class="wrap">
+<div class="stats">
+ <div class="stat"><small>Travellers</small><strong>4 people</strong></div>
+ <div class="stat"><small>Target departure</small><strong>Jun 29–30, 2027</strong></div>
+ <div class="stat"><small>Return target</small><strong>Early September</strong></div>
+ <div class="stat"><small>Trip budget entered</small><strong id="budgetTotal">CA$0</strong></div>
+</div>
+<div class="layout">
+<section class="panel">
+ <div class="map-head"><h2>🗺️ The route</h2><span class="tag">Illustrative route</span></div>
+ <div id="map" aria-label="Interactive map showing planned trip stops"></div>
+ <div class="controls">
+  <button id="play">▶ Play journey</button><button id="pause" class="secondary">Ⅱ Pause</button><button id="next" class="secondary">Next stop →</button><button id="fit" class="secondary">Show whole route</button>
+  <select id="speed" aria-label="Animation speed"><option value="1">Normal speed</option><option value="2">2× speed</option><option value="4">4× speed</option></select>
+ </div>
+ <p class="muted">The moving icons are a visual preview, not live GPS or verified road/rail/ferry navigation. Actual routes, schedules and travel times must be confirmed.</p>
+ <div class="note">⚠️ <b>Ukraine travel safety:</b> Check the Government of Canada's current Ukraine travel advisory before booking or travelling. Recheck border rules, transport and security close to departure.</div>
+</section>
+<section class="panel">
+ <h2>📍 Stops & transport</h2>
+ <div id="routeList" class="route-list"></div>
+</section>
+</div>
+<div class="layout section">
+<section class="panel">
+ <h2>🗓️ Trip dates</h2>
+ <div class="two">
+  <div class="field"><label for="depart">Departure date</label><input id="depart" type="date" value="2027-06-29"></div>
+  <div class="field"><label for="return">Return date</label><input id="return" type="date" value="2027-09-03"></div>
+ </div>
+ <div class="field"><label for="tripNotes">Planning notes</label><textarea id="tripNotes" placeholder="Add date ideas, must-see places, booking notes…"></textarea></div>
+ <button id="saveNotes">Save dates & notes</button> <span id="saveStatus" class="muted">Saved in this browser when you click Save.</span>
+ <p class="muted">These dates are planning placeholders. A return date is not selected until you confirm the tickets.</p>
+</section>
+<section class="panel">
+ <h2>💰 Family budget (CAD)</h2>
+ <p class="muted">Enter estimates or confirmed totals for all four travellers.</p>
+ <div id="budgetRows"></div>
+ <button id="addBudget" class="secondary">＋ Add expense</button>
+ <div class="field"><label for="budgetNotes">Budget notes</label><textarea id="budgetNotes" placeholder="e.g. fares include baggage; rental car deposit…"></textarea></div>
+ <button id="saveBudget">Save budget</button>
+</section>
+</div>
+<div class="layout section">
+<section class="panel">
+ <h2>✅ Booking & preparation checklist</h2>
+ <div id="checklist"></div>
+ <div class="field"><label for="newTask">Add a checklist item</label><input id="newTask" placeholder="e.g. Compare family flight fares"></div>
+ <button id="addTask">Add item</button> <button id="saveTasks" class="secondary">Save checklist</button>
+</section>
+<section class="panel">
+ <h2>🧭 First things to confirm</h2>
+ <div class="check"><span>✈️</span><span>Compare June 29 and 30 flights for four, including baggage and seats.</span></div>
+ <div class="check"><span>🚆</span><span>Check rail schedules and advance fares for each leg.</span></div>
+ <div class="check"><span>⛴️</span><span>Confirm whether Ancona–Split ferries operate on your dates in summer 2027.</span></div>
+ <div class="check"><span>🚗</span><span>Get written confirmation of cross-border rental permission and one-way fees.</span></div>
+ <div class="check"><span>🚌</span><span>Verify the Suceava–Ostroh transport route and border arrangements.</span></div>
+ <div class="check"><span>🛂</span><span>Check passports, entry rules, insurance and current travel advisories.</span></div>
+ <p class="muted">For a real shared website across devices, the next step is hosting this page and adding a database/login. This first version saves edits only in this browser.</p>
+</section>
+</div>
+</main>
+<div class="footer">Made for the family adventure · Map data © OpenStreetMap contributors · Keep booking references and sensitive document numbers somewhere secure.</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const stops=[
+{name:"Vancouver, Canada",lat:49.2827,lon:-123.1207,mode:"✈️",transport:"Flight to Paris",note:"Start at YVR. Compare June 29 and June 30 departures."},
+{name:"Paris, France",lat:48.8566,lon:2.3522,mode:"🚆",transport:"Train to Trier",note:"Arrive at CDG; transfer to Paris Gare de l’Est for the train."},
+{name:"Trier, Germany",lat:49.7499,lon:6.6371,mode:"🚗",transport:"Rental car to Zurich",note:"Confirm rental rules, border permission, insurance and one-way fees."},
+{name:"Zurich, Switzerland",lat:47.3769,lon:8.5417,mode:"🚆",transport:"Train to Kandersteg",note:"Check Swiss rail connections and family fares."},
+{name:"Kandersteg, Switzerland",lat:46.4946,lon:7.6732,mode:"🚆",transport:"Train toward Milan",note:"Confirm connections through the Alps and into Italy."},
+{name:"Milan, Italy",lat:45.4642,lon:9.1900,mode:"🚆",transport:"Train to Ancona",note:"Compare advance fares and seat reservations."},
+{name:"Ancona, Italy",lat:43.6158,lon:13.5189,mode:"⛴️",transport:"Ferry to Split",note:"Seasonal sailing: verify the 2027 timetable before planning around it."},
+{name:"Split, Croatia",lat:43.5081,lon:16.4402,mode:"🚗",transport:"Rental car toward Suceava",note:"Long cross-border drive; confirm route, rental permissions and drop-off charges."},
+{name:"Suceava, Romania",lat:47.6635,lon:26.2732,mode:"🚌",transport:"Bus/ground transport to Ostroh",note:"Verify a real service, border crossing, schedule and current safety conditions."},
+{name:"Ostroh, Ukraine",lat:50.3294,lon:26.5143,mode:"🏁",transport:"Destination",note:"Review Canada's current travel advisory and local security conditions."}
+];
+const map=L.map('map',{scrollWheelZoom:false}).setView([49,12],4);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'}).addTo(map);
+let tilesLoaded=false; map.on('tileload',()=>{tilesLoaded=true;}); map.on('tileerror',()=>{if(!tilesLoaded){document.getElementById('map').style.background='linear-gradient(135deg,#dff2ff,#f0eaff)';}});
+const points=stops.map(s=>[s.lat,s.lon]); const line=L.polyline(points,{color:'#ff806b',weight:4,opacity:.8,dashArray:'7 8'}).addTo(map);
+const markers=[];
+stops.forEach((s,i)=>{const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${i+1}. ${s.name}</b><br>${s.mode} ${s.transport}<br><small>${s.note}</small>`);markers.push(m)});
+map.fitBounds(line.getBounds().pad(.12));
+let current=0,anim=null,segment=0,progress=0;
+const mover=L.marker(points[0],{icon:L.divIcon({className:'moving',html:'✈️',iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
+function iconFor(i){return i===0?'✈️':(stops[i-1]?.mode||'🚆')}
+function renderStops(){document.getElementById('routeList').innerHTML=stops.map((s,i)=>`<article class="stop ${i===current?'active':''}"><div class="emoji">${s.mode}</div><div><h3>${i+1}. ${s.name}</h3><p>${s.transport}</p><p>${s.note}</p></div><button class="secondary" onclick="focusStop(${i})">View</button></article>`).join('')}
+window.focusStop=function(i){current=i;renderStops();map.flyTo(points[i],i===0?4:6,{duration:.7});markers[i].openPopup();mover.setLatLng(points[i]);mover.setIcon(L.divIcon({className:'moving',html:stops[Math.min(i+1,stops.length-1)].mode,iconSize:[32,32],iconAnchor:[16,16]}))};
+function tick(){if(segment>=points.length-1){pause();current=points.length-1;renderStops();return}const a=points[segment],b=points[segment+1];progress+=.003*Number(document.getElementById('speed').value);if(progress>=1){segment++;progress=0;current=segment;renderStops()}const lat=a[0]+(b[0]-a[0])*progress,lon=a[1]+(b[1]-a[1])*progress;mover.setLatLng([lat,lon]);mover.setIcon(L.divIcon({className:'moving',html:stops[Math.min(segment+1,stops.length-1)].mode,iconSize:[32,32],iconAnchor:[16,16]}));anim=requestAnimationFrame(tick)}
+function play(){if(anim)return; if(segment>=points.length-1){segment=0;progress=0}anim=requestAnimationFrame(tick)}
+function pause(){if(anim)cancelAnimationFrame(anim);anim=null}
+document.getElementById('play').onclick=play;document.getElementById('pause').onclick=pause;
+document.getElementById('next').onclick=()=>{pause();segment=Math.min(segment+1,points.length-1);progress=0;current=segment;mover.setLatLng(points[segment]);renderStops();map.flyTo(points[segment],5)};
+document.getElementById('fit').onclick=()=>map.fitBounds(line.getBounds().pad(.12));
+renderStops();
+const defaultBudget=[['Flights (family of 4)',0],['Trains',0],['Rental cars + fuel + tolls',0],['Ferry',0],['Accommodation',0],['Food',0],['Local buses / transfers',0],['Insurance + other',0]];
+let budget=JSON.parse(localStorage.getItem('famtrip_budget')||'null')||defaultBudget;
+function cad(n){return new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0}).format(Number(n)||0)}
+function renderBudget(){document.getElementById('budgetRows').innerHTML=budget.map((r,i)=>`<div class="budget-row"><input aria-label="Expense name" value="${escapeAttr(r[0])}" data-name="${i}"><input type="number" min="0" step="1" aria-label="Cost in Canadian dollars" value="${Number(r[1])||0}" data-cost="${i}"><button class="secondary" aria-label="Remove expense" onclick="removeBudget(${i})">×</button></div>`).join('');document.getElementById('budgetTotal').textContent=cad(budget.reduce((t,r)=>t+(Number(r[1])||0),0))}
+window.removeBudget=i=>{budget.splice(i,1);renderBudget()};
+function readBudget(){document.querySelectorAll('[data-name]').forEach(e=>budget[+e.dataset.name][0]=e.value);document.querySelectorAll('[data-cost]').forEach(e=>budget[+e.dataset.cost][1]=Number(e.value)||0)}
+document.getElementById('addBudget').onclick=()=>{readBudget();budget.push(['New expense',0]);renderBudget()};
+document.getElementById('saveBudget').onclick=()=>{readBudget();localStorage.setItem('famtrip_budget',JSON.stringify(budget));localStorage.setItem('famtrip_budget_notes',document.getElementById('budgetNotes').value);renderBudget();alert('Budget saved in this browser.')};
+function escapeAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+renderBudget();document.getElementById('budgetNotes').value=localStorage.getItem('famtrip_budget_notes')||'';
+document.getElementById('saveNotes').onclick=()=>{localStorage.setItem('famtrip_depart',document.getElementById('depart').value);localStorage.setItem('famtrip_return',document.getElementById('return').value);localStorage.setItem('famtrip_notes',document.getElementById('tripNotes').value);document.getElementById('saveStatus').textContent='Saved ✓';};
+document.getElementById('depart').value=localStorage.getItem('famtrip_depart')||'2027-06-29';document.getElementById('return').value=localStorage.getItem('famtrip_return')||'2027-09-03';document.getElementById('tripNotes').value=localStorage.getItem('famtrip_notes')||'';
+let tasks=JSON.parse(localStorage.getItem('famtrip_tasks')||'null')||[
+['Compare June 29 vs June 30 flights for four',false],['Check passport expiry dates',false],['Compare train fares and connections',false],['Confirm 2027 Ancona–Split ferry schedule',false],['Check rental car cross-border permission and fees',false],['Verify Suceava–Ostroh transport',false],['Review official travel advisories and insurance',false],['Add booking references and accommodation',false]
+];
+function renderTasks(){document.getElementById('checklist').innerHTML=tasks.map((t,i)=>`<label class="check"><input type="checkbox" data-task="${i}" ${t[1]?'checked':''}> <span>${escapeAttr(t[0])}</span></label>`).join('')}
+function saveTasks(){document.querySelectorAll('[data-task]').forEach(e=>tasks[+e.dataset.task][1]=e.checked);localStorage.setItem('famtrip_tasks',JSON.stringify(tasks))}
+document.getElementById('addTask').onclick=()=>{const el=document.getElementById('newTask'),v=el.value.trim();if(v){tasks.push([v,false]);el.value='';renderTasks();saveTasks()}};
+document.getElementById('saveTasks').onclick=()=>{saveTasks();alert('Checklist saved in this browser.')};renderTasks();
+</script>
+</body></html>
