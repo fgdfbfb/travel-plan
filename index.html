@@ -84,17 +84,18 @@ button,input,select,textarea{font:inherit}button{border:0;border-radius:11px;pad
 <div class="footer">Made for the family adventure · Map data © OpenStreetMap contributors · Keep booking references and sensitive document numbers somewhere secure.</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+
 const stops=[
-{name:"Vancouver, Canada",lat:49.2827,lon:-123.1207,mode:"✈️",transport:"Flight to Paris",note:"Start at YVR. Compare June 29 and June 30 departures."},
-{name:"Paris, France",lat:48.8566,lon:2.3522,mode:"🚆",transport:"Train to Trier",note:"Arrive at CDG; transfer to Paris Gare de l’Est for the train."},
-{name:"Trier, Germany",lat:49.7499,lon:6.6371,mode:"🚗",transport:"Rental car to Zurich",note:"Confirm rental rules, border permission, insurance and one-way fees."},
-{name:"Zurich, Switzerland",lat:47.3769,lon:8.5417,mode:"🚆",transport:"Train to Kandersteg",note:"Check Swiss rail connections and family fares."},
-{name:"Kandersteg, Switzerland",lat:46.4946,lon:7.6732,mode:"🚆",transport:"Train toward Milan",note:"Confirm connections through the Alps and into Italy."},
-{name:"Milan, Italy",lat:45.4642,lon:9.1900,mode:"🚆",transport:"Train to Ancona",note:"Compare advance fares and seat reservations."},
-{name:"Ancona, Italy",lat:43.6158,lon:13.5189,mode:"⛴️",transport:"Ferry to Split",note:"Seasonal sailing: verify the 2027 timetable before planning around it."},
-{name:"Split, Croatia",lat:43.5081,lon:16.4402,mode:"🚗",transport:"Rental car toward Suceava",note:"Long cross-border drive; confirm route, rental permissions and drop-off charges."},
-{name:"Suceava, Romania",lat:47.6635,lon:26.2732,mode:"🚌",transport:"Bus/ground transport to Ostroh",note:"Verify a real service, border crossing, schedule and current safety conditions."},
-{name:"Ostroh, Ukraine",lat:50.3294,lon:26.5143,mode:"🏁",transport:"Destination",note:"Review Canada's current travel advisory and local security conditions."}
+{name:"Vancouver, Canada",lat:49.2827,lon:-123.1207,mode:"✈️",transport:"WestJet flight to Paris — June 29, 2027",note:"Family of 4. Fly from YVR to Paris CDG with a connection in Calgary. Confirm flight times and fares."},
+{name:"Paris, France",lat:48.8566,lon:2.3522,mode:"🚆",transport:"TGV INOUI to Luxembourg, then RB train to Trier",note:"Stay 2 days. Travel from Paris Gare de l’Est to Luxembourg, then take a regional train to Trier Hbf. Verify connections and tickets."},
+{name:"Trier, Germany",lat:49.7499,lon:6.6371,mode:"🚗",transport:"RB train to Luxembourg, then rental car to Zurich",note:"Stay 4 days. Return by regional train to Luxembourg and pick up a rental car. Confirm cross-border permissions, insurance and drop-off arrangements."},
+{name:"Zurich, Switzerland",lat:47.3769,lon:8.5417,mode:"🚆",transport:"Train via Bern and Spiez to Kandersteg",note:"Take a train from Zürich HB toward Genève-Aéroport, change at Bern for the Brig–Spiez route, get off at Spiez and continue to Kandersteg. Verify the exact connections."},
+{name:"Kandersteg, Switzerland",lat:46.4946,lon:7.6732,mode:"🚆",transport:"Train via Domodossola toward Milan",note:"Stay 6 days at the family cottage. Plan the Alpine rail journey via Domodossola and confirm the onward connection to Milan."},
+{name:"Milan, Italy",lat:45.4642,lon:9.1900,mode:"🚗",transport:"Rental car to Ancona",note:"Stay 2 days. Arrange a rental car for the drive to Ancona. Check mileage, insurance, border rules and drop-off details."},
+{name:"Ancona, Italy",lat:43.6158,lon:13.5189,mode:"⛴️",transport:"Ferry to Split, Croatia",note:"Check summer 2027 ferry dates, sailing times, fares, cabin options and vehicle rules before booking."},
+{name:"Split, Croatia",lat:43.5081,lon:16.4402,mode:"🚗",transport:"Rental car toward Suceava, Romania",note:"Stay 1 week at a resort. Confirm that the rental company permits travel through all planned countries and check border requirements."},
+{name:"Suceava, Romania",lat:47.6635,lon:26.2732,mode:"🚌",transport:"Bus via Chernivtsi to Khmelnytskyi, then Ostroh",note:"Stay 1 night. Verify each bus leg, transfer times, border requirements and current travel advisories before travelling."},
+{name:"Ostroh, Ukraine",lat:50.3294,lon:26.5143,mode:"🏁",transport:"Final destination",note:"Review Canada's current travel advisory and local security conditions before confirming travel to Ukraine."}
 ];
 const map=L.map('map',{scrollWheelZoom:false}).setView([49,12],4);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
