@@ -97,7 +97,7 @@ const stops=[
 {name:"Ostroh, Ukraine",lat:50.3294,lon:26.5143,mode:"🏁",transport:"Destination",note:"Review Canada's current travel advisory and local security conditions."}
 ];
 const map=L.map('map',{scrollWheelZoom:false}).setView([49,12],4);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
 let tilesLoaded=false; map.on('tileload',()=>{tilesLoaded=true;}); map.on('tileerror',()=>{if(!tilesLoaded){document.getElementById('map').style.background='linear-gradient(135deg,#dff2ff,#f0eaff)';}});
 const points=stops.map(s=>[s.lat,s.lon]); const line=L.polyline(points,{color:'#ff806b',weight:4,opacity:.8,dashArray:'7 8'}).addTo(map);
 const markers=[];
